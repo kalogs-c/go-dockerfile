@@ -1,0 +1,47 @@
+version: '3.3'
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dev.Dockerfile
+    container_name: app
+    networks:
+      - YOUR_APP_NAME-network
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=YOUR_APP_NAME  
+      - POSTGRES_PASSWORD=YOUR_APP_NAME
+      - POSTGRES_DB=YOUR_APP_NAME
+      - DATABASE_HOST=postgres 
+    ports:
+      - '5432:5432'
+    networks:
+      - YOUR_APP_NAME-network
+    
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: YOUR_APP_NAME@admin.com
+      PGADMIN_DEFAULT_PASSWORD: YOUR_APP_NAME
+    depends_on:
+      - postgres
+    ports:
+      - "5050:80"
+    networks:
+      - YOUR_APP_NAME-network
+    restart: unless-stopped  
+
+networks:
+  YOUR_APP_NAME-network:
+    driver: bridge
